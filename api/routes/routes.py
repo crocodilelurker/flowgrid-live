@@ -23,7 +23,7 @@ def root():
 async def encrypt(request: EncrpytRequest):
     try:
         fernet = Fernet(request.key.encode())
-        encrypted_data = fernet.encrypt(request.data.encode())
+        encrypted_data = fernet.encrypt_at_time(request.data.encode())
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
     return {
