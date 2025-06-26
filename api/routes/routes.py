@@ -7,6 +7,10 @@ router = APIRouter()
 class EncrpytRequest(BaseModel):
     key: str
     data: str
+
+@router.get("/")
+def root():
+    return {"message": "Welcome to the Flowgrid fernet api"}
 @router.get("/generate_key")
 async def generate_key():
     try:
@@ -16,9 +20,6 @@ async def generate_key():
     return{
         "key":key
     }
-@router.get("/")
-def root():
-    return {"message": "Welcome to the Flowgrid fernet api"}
 @router.post("/encrypt")
 async def encrypt(request: EncrpytRequest):
     try:
