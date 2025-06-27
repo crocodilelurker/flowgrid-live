@@ -1,8 +1,10 @@
 from pymongo.mongo_client import MongoClient
 from pymongo.server_api import ServerApi
 from motor.motor_asyncio import AsyncIOMotorClient
-
-uri = "mongodb+srv://swagatsahu556:swagatsahu556@fg-0.vheqoan.mongodb.net/?retryWrites=true&w=majority&appName=FG-0"
+from dotenv import load_dotenv
+import os
+load_dotenv()
+uri = os.getenv("MONGO_URI")
 
 def connectDB():
     client = MongoClient(uri, server_api=ServerApi('1'))
