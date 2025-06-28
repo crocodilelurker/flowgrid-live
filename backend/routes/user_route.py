@@ -2,6 +2,7 @@ from fastapi import APIRouter
 from database.models import User
 from configurations import UserCollection
 from bson import ObjectId
+from utils.passkey import hash_password
 router = APIRouter(prefix="/users", tags=["Users"])
 @router.get("/")
 def root():
@@ -10,6 +11,11 @@ def root():
 @router.post("/create-user")
 async def create_user(user:User):
     try:
+        hashed_password = hash_password(user.password)
+        user.password = hashed_password
+        existing_user = await UserCollection.find_one({"username": user.username})
+        if existing_user:
+            return {"status_code": 400, "message": "User already exists"}
         result= await UserCollection.insert_one(dict(user))
         return {"status_code": 201, "message": "User created successfully", "user_id": str(result.inserted_id)}
     except Exception as e:
@@ -34,3 +40,4 @@ async def get_user(user_id: str):
             return {"status_code": 404, "message": "User not found"}
     except Exception as e:
         return {"status_code": 500, "message": "Error retrieving user", "error": str(e)}
+    

@@ -3,6 +3,7 @@ from configurations import UserCollection
 from database.models import User_Auth
 from datetime import datetime, timedelta
 from dotenv import load_dotenv
+from utils.passkey import verify_password
 import os,jwt
 load_dotenv()
 JWT_EXPIRY_TIME = int(os.getenv("JWT_EXPIRY_TIME", 3600))
@@ -15,9 +16,8 @@ def root():
 @router.post("/login")
 async def login(user: User_Auth,response: Response):
     try:
-        user_data = await UserCollection.find_one({"username": user.username, "password": user.password},
-            projection={"password": 0})
-        if user_data:
+        user_data = await UserCollection.find_one({"username": user.username})
+        if user_data and verify_password(user.password, user_data["password"]):
             token_payload = {"user_id": str(user_data["_id"]), "username": user_data["username"],"exp": datetime.utcnow() + timedelta(seconds=JWT_EXPIRY_TIME) }
             jwt_token = jwt.encode(token_payload, SECRET_KEY, algorithm=os.getenv("JWT_ALGORITHM", "HS256"))
             response.set_cookie(key="jwt_token", value=jwt_token, httponly=True, samesite="lax")
