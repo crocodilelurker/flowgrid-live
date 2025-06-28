@@ -16,3 +16,7 @@ class Transaction(BaseModel):
     sender_id:str
     receiver_id:str
     created_at:int =int(datetime.timestamp(datetime.now()))
+
+class User_Auth(BaseModel):
+    username:str
+    password:str
