@@ -1,8 +1,9 @@
-from fastapi import APIRouter
+from fastapi import APIRouter,Request
 from database.models import User
 from configurations import UserCollection
 from bson import ObjectId
 from utils.passkey import hash_password
+from utils.verify_jwt import verify_jwt 
 router = APIRouter(prefix="/users", tags=["Users"])
 @router.get("/")
 def root():
@@ -31,8 +32,11 @@ def convert_object_id_to_str(data):
         return data
 
 @router.get("/get-user/{user_id}")
-async def get_user(user_id: str):
+async def get_user(user_id: str, request: Request):
     try:
+        #if the user has a jwt token in cookies only then he can access this endpoint
+        if not verify_jwt(request):
+            return {"status_code": 401, "message": "Unauthorized access"}
         user = await UserCollection.find_one({"_id": ObjectId(user_id)})
         if user:
             return {"status_code": 200, "message": "User found", "user": convert_object_id_to_str(user)}
