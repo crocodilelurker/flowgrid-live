@@ -16,3 +16,5 @@ def individual_transaction_details(transaction):
     }
 def all_users_details(users):
     return [individual_user_details(user) for user in users]
+def all_transactions_details(transactions):
+    return [individual_transaction_details(transaction) for transaction in transactions]
