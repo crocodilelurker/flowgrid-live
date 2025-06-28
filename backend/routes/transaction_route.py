@@ -1,8 +1,8 @@
-from fastapi import APIRouter
+from fastapi import APIRouter,Request
 from database.models import Transaction
 from configurations import TransactionCollection
 from bson import ObjectId
-
+from utils.verify_jwt import verify_jwt
 router = APIRouter(prefix="/transactions", tags=["Transactions"])
 @router.get("/")
 def root():
@@ -24,8 +24,11 @@ def convert_object_id_to_str(data):
     else:
         return data
 @router.get("/get-transaction/{transaction_id}")
-async def get_transaction(transaction_id: str):
+async def get_transaction(transaction_id: str, request: Request):
     try:
+        #if the user has a jwt token in cookies only then he can access this endpoint
+        if not verify_jwt(request):
+            return {"status_code": 401, "message": "Unauthorized access"}
         transaction = await TransactionCollection.find_one({"_id": ObjectId(transaction_id)})
         if transaction:
             return {"status_code": 200, "message": "Transaction found", "transaction": convert_object_id_to_str(transaction)}
