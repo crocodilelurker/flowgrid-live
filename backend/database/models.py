@@ -4,7 +4,7 @@ from datetime import datetime
 class User(BaseModel):
     username:str
     email:str
-    balance:float=0.0
+    balance:int = 0
     password:str
     items:list[str]=[]
     created_at:int = int(datetime.timestamp(datetime.now()))

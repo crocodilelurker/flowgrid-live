@@ -1,16 +1,20 @@
 from fastapi import APIRouter,Request
-from database.models import Transaction
 from configurations import TransactionCollection
 from bson import ObjectId
 from utils.verify_jwt import verify_jwt
+from database.Service_Models.Transaction_Service import Transaction_Model 
+from services.TransactionServices import validate_transaction,process_transaction
 router = APIRouter(prefix="/transactions", tags=["Transactions"])
 @router.get("/")
 def root():
     return {"message": "Welcome to FlowGrid Live! Transaction API"}
 @router.post("/create-transaction")
-async def create_transaction(transaction: Transaction):
+async def create_transaction(transaction: Transaction_Model, request: Request):
     try:
-        result = await TransactionCollection.insert_one(dict(transaction))
+        if not verify_jwt(request):
+            return {"status_code": 401, "message": "Unauthorized access"}
+        await validate_transaction(transaction, request)
+        await process_transaction(transaction, request)
         return {"status_code": 201, "message": "Transaction created successfully", "transaction_id": str(result.inserted_id)}
     except Exception as e:
         return {"status_code": 500, "message": "Error creating transaction", "error": str(e)}
@@ -26,7 +30,6 @@ def convert_object_id_to_str(data):
 @router.get("/get-transaction/{transaction_id}")
 async def get_transaction(transaction_id: str, request: Request):
     try:
-        #if the user has a jwt token in cookies only then he can access this endpoint
         if not verify_jwt(request):
             return {"status_code": 401, "message": "Unauthorized access"}
         transaction = await TransactionCollection.find_one({"_id": ObjectId(transaction_id)})
