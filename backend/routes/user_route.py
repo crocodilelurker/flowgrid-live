@@ -16,12 +16,13 @@ async def create_user(user:User,request:Request,response:Response):
         try:
             hashed_password = hash_password(user.password)
             user.password = hashed_password
-            user.fernet_key=generate_key()
+            fern=generate_key()
+            user.fernet_key=fern
             existing_user = await UserCollection.find_one({"username": user.username})
             if existing_user:
                 return {"status_code": 400, "message": "User already exists"}
             result= await UserCollection.insert_one(dict(user))
-            return {"status_code": 201, "message": "User created successfully", "user_id": str(result.inserted_id)}
+            return {"status_code": 201, "message": "User created successfully", "user_id": str(result.inserted_id),"fernet_key":str(fern)}
         except Exception as e:
             return {"status_code": 500, "message": "Error creating user", "error": str(e)}
 def convert_object_id_to_str(data):
