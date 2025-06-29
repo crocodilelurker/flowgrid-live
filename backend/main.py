@@ -1,4 +1,6 @@
 from fastapi import FastAPI
+from fastapi.responses import FileResponse
+from fastapi.staticfiles import StaticFiles
 from configurations import connectDB
 from contextlib import asynccontextmanager
 from routes.user_route import router as userRoutes
@@ -10,6 +12,10 @@ async def lifespan(app: FastAPI):
     yield
     print("Shutting down the application...")
 app = FastAPI(lifespan=lifespan)
+app.mount("/static", StaticFiles(directory="static"), name="static")
+@app.get("/favicon.ico", include_in_schema=False)
+async def favicon():
+    return FileResponse("static/favicon.ico")
 app.get("/")(lambda: {"message": "Welcome to FlowGrid Live! API"})
 
 app.include_router(userRoutes)
