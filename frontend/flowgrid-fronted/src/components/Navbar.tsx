@@ -2,15 +2,7 @@
 
 import Link from 'next/link';
 
-type NavbarProps = {
-  isLoggedIn?: boolean;
-  balance?: number;
-};
-
- function Navbar({ 
-  isLoggedIn = false, 
-  balance = 0 
-}: NavbarProps) {
+ function Navbar() {
   return (
     <nav className="bg-gray-900 text-white shadow-lg">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -31,42 +23,6 @@ type NavbarProps = {
               <NavLink href="/trading">Trading</NavLink>
               <NavLink href="/nfts">NFTs</NavLink>
             </div>
-          </div>
-
-          {/* Right Section */}
-          <div className="flex items-center gap-4">
-            {/* User Balance */}
-            {isLoggedIn && (
-              <div className="hidden md:flex items-center space-x-1 bg-gray-800 px-3 py-1 rounded-md">
-                <span className="text-sm font-medium">Balance:</span>
-                <span className="font-bold text-blue-300">{balance} FGC</span>
-              </div>
-            )}
-
-            {/* Auth Buttons */}
-            {isLoggedIn ? (
-              <Link
-                href="/logout"
-                className="px-4 py-2 text-sm bg-red-600 hover:bg-red-700 rounded-md transition"
-              >
-                Sign Out
-              </Link>
-            ) : (
-              <div className="flex space-x-2">
-                <Link
-                  href="/login"
-                  className="px-4 py-2 text-sm bg-gray-700 hover:bg-gray-600 rounded-md transition"
-                >
-                  Login
-                </Link>
-                <Link
-                  href="/signup"
-                  className="px-4 py-2 text-sm bg-blue-600 hover:bg-blue-700 rounded-md transition"
-                >
-                  Sign Up
-                </Link>
-              </div>
-            )}
           </div>
         </div>
       </div>
