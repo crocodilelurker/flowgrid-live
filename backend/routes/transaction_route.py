@@ -17,7 +17,6 @@ async def create_transaction(transaction: Transaction_Model, request: Request):
         await update_transaction(transaction, request)
         await process_transaction(transaction, request)
         return {"status_code": 201, "message": "Transaction created successfully"}
-    
     except Exception as e:
         return {"status_code": 500, "message": "Error creating transaction", "error": str(e)}
 def convert_object_id_to_str(data):

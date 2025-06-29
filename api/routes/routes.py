@@ -12,14 +12,16 @@ class EncrpytRequest(BaseModel):
 def root():
     return {"message": "Welcome to the Flowgrid fernet api"}
 @router.get("/generate_key")
-async def generate_key():
+async def key_generator():
     try:
         key= Fernet.generate_key()
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
-    return{
+    #return with status code 200
+    return {
         "key":key
     }
+    
 @router.post("/encrypt")
 async def encrypt(request: EncrpytRequest):
     try:
