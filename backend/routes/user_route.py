@@ -1,26 +1,29 @@
-from fastapi import APIRouter,Request
+from fastapi import APIRouter,Request,Response
 from database.models import User
 from configurations import UserCollection
 from bson import ObjectId
 from utils.passkey import hash_password
-from utils.verify_jwt import verify_jwt 
+from utils.verify_jwt import verify_jwt
+from services.UserServices import generate_key 
 router = APIRouter(prefix="/users", tags=["Users"])
 @router.get("/")
 def root():
     return {"message": "Welcome to FlowGrid Live! User API"}
 
 @router.post("/create-user")
-async def create_user(user:User):
-    try:
-        hashed_password = hash_password(user.password)
-        user.password = hashed_password
-        existing_user = await UserCollection.find_one({"username": user.username})
-        if existing_user:
-            return {"status_code": 400, "message": "User already exists"}
-        result= await UserCollection.insert_one(dict(user))
-        return {"status_code": 201, "message": "User created successfully", "user_id": str(result.inserted_id)}
-    except Exception as e:
-        return {"status_code": 500, "message": "Error creating user", "error": str(e)}
+async def create_user(user:User,request:Request,response:Response):
+    if not verify_jwt(request):
+        try:
+            hashed_password = hash_password(user.password)
+            user.password = hashed_password
+            user.fernet_key=generate_key()
+            existing_user = await UserCollection.find_one({"username": user.username})
+            if existing_user:
+                return {"status_code": 400, "message": "User already exists"}
+            result= await UserCollection.insert_one(dict(user))
+            return {"status_code": 201, "message": "User created successfully", "user_id": str(result.inserted_id)}
+        except Exception as e:
+            return {"status_code": 500, "message": "Error creating user", "error": str(e)}
 def convert_object_id_to_str(data):
     if isinstance(data, dict): 
         return {k: convert_object_id_to_str(v) for k, v in data.items()}
