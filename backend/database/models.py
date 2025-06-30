@@ -20,3 +20,9 @@ class Transaction(BaseModel):
 class User_Auth(BaseModel):
     username:str
     password:str
+
+class Create_User(BaseModel):
+    username:str
+    password:str
+    email:str
+    
