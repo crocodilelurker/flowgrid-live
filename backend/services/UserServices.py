@@ -37,3 +37,13 @@ def generate_key():
     except ValueError as ve:
         print(f"Invalid response from the API: {str(ve)}")
         return None
+async def admin_convert(token_payload):
+    try:
+        user_id= token_payload.get("user_id")
+        await UserCollection.find_one({"_id": ObjectId(user_id)})
+        #updating user with admin status to True
+        await UserCollection.find_one_and_update({"_id":ObjectId(user_id)},{"$set": {"is_admin": True}})
+        return True;
+    except Exception as e:
+        print(f"Invalid response from the API: {str(e)}")
+        return False

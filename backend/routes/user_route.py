@@ -4,7 +4,7 @@ from configurations import UserCollection
 from bson import ObjectId
 from utils.passkey import hash_password
 from utils.verify_jwt import verify_jwt
-from services.UserServices import generate_key 
+from services.UserServices import generate_key,admin_convert
 router = APIRouter(prefix="/users", tags=["Users"])
 @router.get("/")
 def root():
@@ -55,4 +55,19 @@ async def get_user(user_id: str, request: Request):
             return {"status_code": 404, "message": "User not found"}
     except Exception as e:
         return {"status_code": 500, "message": "Error retrieving user", "error": str(e)}
-    
+
+@router.get("/admin-converter")
+async def admin_converter(request:Request):
+    #verify JWT token 
+    try:
+        token_payload=verify_jwt(request)
+        if not token_payload:
+            return {"status_code": 401, "message": "Unauthorized access"}
+        result = await admin_convert(token_payload)
+        if(result):
+            return {"message":"Authorized Admin"}
+        else:
+            return {"status_code":500, "message":"Error Resolving Admin"}
+        
+    except Exception as e:
+        return {"status_code": 500, "message": "Error retrieving admin_status", "error": str(e)}

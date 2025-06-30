@@ -9,6 +9,7 @@ class User(BaseModel):
     items:list[str]=[]
     created_at:int = int(datetime.timestamp(datetime.now()))
     fernet_key:str = None
+    is_admin:bool= False
 
 
 class Transaction(BaseModel):

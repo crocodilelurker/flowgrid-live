@@ -17,7 +17,10 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 @app.get("/favicon.ico", include_in_schema=False)
 async def favicon():
     return FileResponse("static/favicon.ico")
-app.get("/")(lambda: {"message": "Welcome to FlowGrid Live! API"})
+@app.get("/")
+def home():
+    return {"message": "Welcome to FlowGrid Live! API"}
+
 
 app.include_router(userRoutes)
 app.include_router(transactionRoutes)
