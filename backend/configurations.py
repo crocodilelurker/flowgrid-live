@@ -18,3 +18,4 @@ client = AsyncIOMotorClient(uri, server_api=ServerApi('1'))
 database= client['flowgrid']
 UserCollection = database["Users"]
 TransactionCollection = database["Transactions"]
+ItemCollection=database["Items"]
