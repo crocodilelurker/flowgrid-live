@@ -6,6 +6,7 @@ from contextlib import asynccontextmanager
 from routes.user_route import router as userRoutes
 from routes.transaction_route import router as transactionRoutes
 from routes.auth_route import router as authRoutes
+from routes.item_route import router as itemRoutes
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     connectDB()
@@ -21,3 +22,4 @@ app.get("/")(lambda: {"message": "Welcome to FlowGrid Live! API"})
 app.include_router(userRoutes)
 app.include_router(transactionRoutes)
 app.include_router(authRoutes)
+app.include_router(itemRoutes)
