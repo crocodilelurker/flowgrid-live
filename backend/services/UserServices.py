@@ -40,10 +40,23 @@ def generate_key():
 async def admin_convert(token_payload):
     try:
         user_id= token_payload.get("user_id")
-        await UserCollection.find_one({"_id": ObjectId(user_id)})
         #updating user with admin status to True
         await UserCollection.find_one_and_update({"_id":ObjectId(user_id)},{"$set": {"is_admin": True}})
         return True;
     except Exception as e:
         print(f"Invalid response from the API: {str(e)}")
         return False
+async def admin_stat(request:Request):
+    token_payload=verify_jwt(request)
+    try:
+        user_id= token_payload.get("user_id")
+        user = await UserCollection.find_one({"_id": ObjectId(user_id)})
+        is_admin=user["is_admin"]
+        if(is_admin==True):
+            print("Is a Admin")
+            return True
+        else:
+            print("Not a Admin")
+            return False
+    except Exception as e:
+        return {"message":"Error Retrieving is_admin"}
