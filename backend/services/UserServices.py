@@ -51,7 +51,7 @@ async def admin_stat(request:Request):
     try:
         user_id= token_payload.get("user_id")
         user = await UserCollection.find_one({"_id": ObjectId(user_id)})
-        is_admin=user["is_admin"]
+        is_admin=user.get("is_admin",False)
         if(is_admin==True):
             print("Is a Admin")
             return True

@@ -1,6 +1,6 @@
 from fastapi import APIRouter,Request
 from services.UserServices import admin_stat
-from database.ItemModels import Item_Uplink
+from database.ItemModels import Item_Uplink,Item_Log
 from configurations import ItemCollection
 from datetime import datetime
 from services.UserServices import get_user_id
@@ -12,7 +12,7 @@ def root():
     return {"message": "Welcome to FlowGrid Live! Items API"}
 
 @router.post("/add-items")
-async def add_items(request:Request, item:Item_Uplink):
+async def add_items(request:Request, item:Item_Log):
     #we need to verufy that he is admin or not
     #we use services
     is_admin= await admin_stat(request)
@@ -24,14 +24,30 @@ async def add_items(request:Request, item:Item_Uplink):
                 title=item.title,
                 value=item.value,
                 issuer_id=await get_user_id(request),
-                created_at= int(datetime.timestamp(datetime.now()))
+                created_at= int(datetime.timestamp(datetime.now())),
+                prev_transaction=item.prev_transaction,
+                current_owner=""
             )
             result = await ItemCollection.insert_one(dict(item_data)) 
             return {"status_code": 201, "message": "Item created successfully", "item_id": str(result.inserted_id)}
         except Exception as e:
             return {"status_code": 500, "message": "Error during adding", "error": str(e)}
     else:
-        return {"status_code": 401, "message": "Invalid credentials"}
+        #code for issuing the new item to the user 
+        try:
+            item_data=Item_Uplink(
+                name=item.name,
+                title=item.title,
+                value=item.value,
+                issuer_id=await get_user_id(request),
+                created_at= int(datetime.timestamp(datetime.now())),
+                prev_transaction=[str(await get_user_id(request))],
+                current_owner=await get_user_id(request)
+            )
+            result = await ItemCollection.insert_one(dict(item_data)) 
+            return {"status_code": 201, "message": "Item created successfully", "item_id": str(result.inserted_id)}
+        except Exception as e:
+            return {"status_code": 500, "message": "Error during adding", "error": str(e)}
     
 def convert_object_id_to_str(data):
     if isinstance(data, dict): 

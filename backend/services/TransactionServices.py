@@ -69,3 +69,4 @@ async def process_transaction(transaction: Transaction_Model, request: Request):
         except Exception as e:
             print(f"Error processing transaction: {str(e)}")
             raise HTTPException(status_code=500, detail="Error processing transaction")
+        
