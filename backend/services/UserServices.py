@@ -60,3 +60,16 @@ async def admin_stat(request:Request):
             return False
     except Exception as e:
         return {"message":"Error Retrieving is_admin"}
+
+async def get_items_list(user:str):
+    user_id=ObjectId(user)
+    try:
+        User=await UserCollection.find_one({"_id":user_id})
+    except Exception as e:
+        return {"message":"Error in finding User","error":str(e)}
+    items_list=[]
+    try:
+        items_list=User.get("items",[])
+    except Exception as e:
+        return {"message":"Error in finding User List","error":str(e)}
+    return items_list

@@ -3,7 +3,11 @@ from configurations import TransactionCollection
 from bson import ObjectId
 from utils.verify_jwt import verify_jwt
 from database.Service_Models.Transaction_Service import Transaction_Model 
+from database.ItemModels import Item_Transacton
+from database.models import Item_Transaction
+from services.ItemServices import return_currowner,update_item_transaction,validate_item_transaction
 from services.TransactionServices import validate_transaction,process_transaction,update_transaction
+from services.UserServices import get_user_id
 router = APIRouter(prefix="/transactions", tags=["Transactions"])
 @router.get("/")
 def root():
@@ -40,3 +44,28 @@ async def get_transaction(transaction_id: str, request: Request):
             return {"status_code": 404, "message": "Transaction not found"}
     except Exception as e:
         return {"status_code": 500, "message": "Error retrieving transaction", "error": str(e)}
+@router.post("/create-item-transaction/{item_id}")
+async def create_item_t(item_id:str,request:Request,item_data:Item_Transacton):
+    curr_owner=return_currowner(id)
+    if(curr_owner!=get_user_id(request)):
+        return {"message":"Invalid Credentials"}
+    else:
+        receiver_id=item_data.receiver_id
+        sender_id=str(get_user_id)
+        item_t_data=Item_Transaction(
+            name=item_data.name,
+            sender_id=str(get_user_id(request)),
+            receiver_id=item_id
+        )
+        #update_transaction servicein item service 
+        try:
+            await validate_item_transaction(str(item_id),sender_id,request)
+            await update_item_transaction(receiver_id,sender_id,item_id)
+        except Exception as e:
+            return{"message":"Error in updating transaction","error":str(e)}
+
+    return 
+
+@router.get("/get-item-transaction/{item_id}")
+async def get_item_t():
+    return

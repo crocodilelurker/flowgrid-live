@@ -14,3 +14,8 @@ class Item_Log(BaseModel):
     title:str
     value:int
     prev_transaction:list[str]=[]
+
+class Item_Transacton:
+    name:str
+    receiver_id:str
+    sender_id:str

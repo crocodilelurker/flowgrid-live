@@ -27,3 +27,8 @@ class Create_User(BaseModel):
     password:str
     email:str
     
+class Item_Transaction(BaseModel):
+    name:str
+    sender_id:str
+    receiver_id:str
+    

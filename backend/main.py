@@ -24,5 +24,6 @@ def home():
 
 app.include_router(userRoutes)
 app.include_router(transactionRoutes)
-app.include_router(authRoutes)
 app.include_router(itemRoutes)
+app.include_router(authRoutes)
+
