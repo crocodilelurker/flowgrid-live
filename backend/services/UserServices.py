@@ -11,7 +11,7 @@ async def get_balance(request:Request):
         token_payload=verify_jwt(request)
         user_id = token_payload.get("user_id")
         user = await UserCollection.find_one({"_id": ObjectId(user_id)})
-        return user['balance']
+        return user.get("balance",-1)
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error retrieving user balance: {str(e)}")
     

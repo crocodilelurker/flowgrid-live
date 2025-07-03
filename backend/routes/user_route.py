@@ -75,7 +75,7 @@ async def admin_converter(request:Request):
 @router.get("/get-user-balance")
 async def get_b(request:Request):
     try:
-        balance= get_balance(request)
+        balance= await get_balance(request)
         return {"balance":balance}
     except Exception as e:
         return {"status_code": 500, "message": "Error retrieving balance", "error": str(e)}
