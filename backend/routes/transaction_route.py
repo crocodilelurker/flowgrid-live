@@ -46,20 +46,17 @@ async def get_transaction(transaction_id: str, request: Request):
         return {"status_code": 500, "message": "Error retrieving transaction", "error": str(e)}
 @router.post("/create-item-transaction/{item_id}")
 async def create_item_t(item_id:str,request:Request,item_data:Item_Transacton):
-    curr_owner=return_currowner(id)
-    if(curr_owner!=get_user_id(request)):
+    curr_owner=await return_currowner(item_id)
+    if(str(curr_owner)!=str(await get_user_id(request))):
+        print(curr_owner)
+        print(await get_user_id(request))
         return {"message":"Invalid Credentials"}
     else:
         receiver_id=item_data.receiver_id
-        sender_id=str(get_user_id)
-        item_t_data=Item_Transaction(
-            name=item_data.name,
-            sender_id=str(get_user_id(request)),
-            receiver_id=item_id
-        )
+        sender_id=str(await get_user_id(request))
         #update_transaction servicein item service 
         try:
-            await validate_item_transaction(str(item_id),sender_id,request)
+            await validate_item_transaction(str(item_id),request)
             await update_item_transaction(receiver_id,sender_id,item_id)
         except Exception as e:
             return{"message":"Error in updating transaction","error":str(e)}

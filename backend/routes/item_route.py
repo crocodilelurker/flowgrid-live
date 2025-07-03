@@ -1,9 +1,9 @@
 from fastapi import APIRouter,Request
 from services.UserServices import admin_stat
 from database.ItemModels import Item_Uplink,Item_Log
-from configurations import ItemCollection
+from configurations import ItemCollection,UserCollection
 from datetime import datetime
-from services.UserServices import get_user_id
+from services.UserServices import get_user_id,get_items_list
 from bson import ObjectId
 from utils.verify_jwt import verify_jwt
 router= APIRouter(prefix="/item",tags=["Items"])
@@ -35,6 +35,10 @@ async def add_items(request:Request, item:Item_Log):
     else:
         #code for issuing the new item to the user 
         try:
+            isu_id= await get_user_id(request)
+            items_list=[]
+            items_list= await get_items_list(str(isu_id))
+            items_list.append({})
             item_data=Item_Uplink(
                 name=item.name,
                 title=item.title,
@@ -45,6 +49,16 @@ async def add_items(request:Request, item:Item_Log):
                 current_owner=await get_user_id(request)
             )
             result = await ItemCollection.insert_one(dict(item_data)) 
+            isu_id= await get_user_id(request)
+            items_list=[]
+            items_list= await get_items_list(str(isu_id))
+            items_list.append(str(result.inserted_id))
+            await UserCollection.update_one(
+                {"_id": ObjectId(isu_id)},
+                {"$set": {"items": items_list}}
+            )
+
+    
             return {"status_code": 201, "message": "Item created successfully", "item_id": str(result.inserted_id)}
         except Exception as e:
             return {"status_code": 500, "message": "Error during adding", "error": str(e)}
