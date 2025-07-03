@@ -4,7 +4,7 @@ from configurations import UserCollection
 from bson import ObjectId
 from utils.passkey import hash_password
 from utils.verify_jwt import verify_jwt
-from services.UserServices import generate_key,admin_convert
+from services.UserServices import generate_key,admin_convert,get_balance
 router = APIRouter(prefix="/users", tags=["Users"])
 @router.get("/")
 def root():
@@ -71,3 +71,11 @@ async def admin_converter(request:Request):
         
     except Exception as e:
         return {"status_code": 500, "message": "Error retrieving admin_status", "error": str(e)}
+
+@router.get("/get-user-balance")
+async def get_b(request:Request):
+    try:
+        balance= get_balance(request)
+        return {"balance":balance}
+    except Exception as e:
+        return {"status_code": 500, "message": "Error retrieving balance", "error": str(e)}
