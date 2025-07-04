@@ -18,9 +18,9 @@ async def login(user: User_Auth,response: Response):
     try:
         user_data = await UserCollection.find_one({"username": user.username})
         if user_data and verify_password(user.password, user_data["password"]):
-            token_payload = {"user_id": str(user_data["_id"]), "username": user_data["username"],"exp": datetime.utcnow() + timedelta(seconds=JWT_EXPIRY_TIME) }
+            token_payload = {"user_id": str(user_data["_id"]), "username": user_data["username"] }
             jwt_token = jwt.encode(token_payload, SECRET_KEY, algorithm=os.getenv("JWT_ALGORITHM", "HS256"))
-            response.set_cookie(key="jwt_token", value=jwt_token, httponly=True, samesite="lax")
+            response.set_cookie(key="jwt_token", value=jwt_token, httponly=True, samesite="lax",secure=False,path="/",max_age=3600)
             return {"status_code": 200, "message": "Login successful", "user_id": str(user_data["_id"])}
         else:
             return {"status_code": 401, "message": "Invalid credentials"}
@@ -32,7 +32,7 @@ async def logout(response: Response):
     response.delete_cookie(key="jwt_token")
     return {"status_code": 200, "message": "Logout successful"}
 @router.get("/verify-token")
-async def verify_token(request: Request, response: Response):
+async def verify_token(request: Request):
     jwt_token = request.cookies.get("jwt_token")
     if not jwt_token:
         return {"status_code": 401, "message": "No token provided"}

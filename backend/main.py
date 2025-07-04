@@ -7,12 +7,21 @@ from routes.user_route import router as userRoutes
 from routes.transaction_route import router as transactionRoutes
 from routes.auth_route import router as authRoutes
 from routes.item_route import router as itemRoutes
+from fastapi.middleware.cors import CORSMiddleware
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     connectDB()
     yield
     print("Shutting down the application...")
 app = FastAPI(lifespan=lifespan)
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:3000"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 app.mount("/static", StaticFiles(directory="static"), name="static")
 @app.get("/favicon.ico", include_in_schema=False)
 async def favicon():
