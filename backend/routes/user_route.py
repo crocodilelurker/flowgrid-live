@@ -4,7 +4,7 @@ from configurations import UserCollection
 from bson import ObjectId
 from utils.passkey import hash_password
 from utils.verify_jwt import verify_jwt
-from services.UserServices import generate_key,admin_convert,get_balance
+from services.UserServices import generate_key,admin_convert,get_balance,get_user_id,buy_coins
 router = APIRouter(prefix="/users", tags=["Users"])
 @router.get("/")
 def root():
@@ -79,3 +79,10 @@ async def get_b(request:Request):
         return {"balance":balance}
     except Exception as e:
         return {"status_code": 500, "message": "Error retrieving balance", "error": str(e)}
+@router.get("/buy-balacne")
+async def buy_b(amt:int,request:Request):
+    try:
+        userI = str (await get_user_id(request))
+        result= await buy_coins(userI,amt)
+    except Exception as e:
+        print("op")

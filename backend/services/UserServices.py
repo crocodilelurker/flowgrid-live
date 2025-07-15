@@ -73,3 +73,16 @@ async def get_items_list(user:str):
     except Exception as e:
         return {"message":"Error in finding User List","error":str(e)}
     return items_list
+
+async def buy_coins(user:str,amt:int):
+    user_id=ObjectId(user)
+    try:
+        result=await UserCollection.find_one_and_update(
+                {"_id": user_id},
+                {"$inc": {"balance": amt}}
+            )
+        
+        print("Bought Coins Succesfully")
+        return {"message":"Success in Buying"}
+    except Exception as e:
+        return {"message":"Error in finding User in buy_coins","error":str(e)}
